@@ -1,7 +1,9 @@
 package com.example.exp02;
 
+import java.util.Map;
+
 public interface CognitoService {
 	
 	
-    String getCognitoJWT(String authString) throws Exception;
+	Map<String, Object> getCognitoJWT(String authString) throws Exception;
 }

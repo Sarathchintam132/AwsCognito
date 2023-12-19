@@ -22,12 +22,12 @@ public class CognitoServiceImpl implements CognitoService {
     }
 
     @Override
-    public String getCognitoJWT(String authString) throws Exception {
+    public Map<String, Object> getCognitoJWT(String authString) throws Exception {
         Map<String, String> credentials = parseAuthString(authString);
         return authenticateWithCognito(credentials.get("username"), credentials.get("password"));
     }
 
-    private String authenticateWithCognito(String username, String password) {
+    private Map<String, Object> authenticateWithCognito(String username, String password) {
         AdminInitiateAuthRequest authRequest = AdminInitiateAuthRequest.builder()
                 .clientId(cognitoConfig.getClientId())
                 .userPoolId(cognitoConfig.getUserPoolId())
@@ -36,7 +36,13 @@ public class CognitoServiceImpl implements CognitoService {
                 .build();
 
         AdminInitiateAuthResponse authResponse = cognitoClient.adminInitiateAuth(authRequest);
-        return authResponse.authenticationResult().idToken();
+        
+        Map<String,Object> response = new HashMap<>();
+        response.put("idToken",authResponse.authenticationResult().idToken());
+        response.put("refreshToken",authResponse.authenticationResult().refreshToken());
+        response.put("AccessToken",authResponse.authenticationResult().accessToken());
+        
+        return response;
     }
 
     private Map<String, String> parseAuthString(String authString) throws Exception {

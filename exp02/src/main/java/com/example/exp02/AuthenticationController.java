@@ -1,5 +1,8 @@
 package com.example.exp02;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +23,14 @@ public class AuthenticationController {
     }
 
     @GetMapping("/authenticate")
-    public ResponseEntity<String> authenticate(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<Map<String,Object>> authenticate(@RequestHeader("Authorization") String authorization) {
         try {
-            String jwt = cognitoService.getCognitoJWT(authorization);
+             Map<String,Object> jwt = cognitoService.getCognitoJWT(authorization);
             return ResponseEntity.ok(jwt);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
+        	Map<String,Object> errorResponse = new HashMap<>();
+        	errorResponse.put("errorResponse",e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }  
     
