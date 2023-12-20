@@ -2,10 +2,20 @@ package com.example.exp02;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
 
 import java.util.Base64;
+import java.util.Base64.Decoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +47,22 @@ public class CognitoServiceImpl implements CognitoService {
 
         AdminInitiateAuthResponse authResponse = cognitoClient.adminInitiateAuth(authRequest);
         
+        String jwtToken = authResponse.authenticationResult().idToken();
+//        Jws<Claims> jwt = Jwts.parser()
+//                .parseClaimsJws(jwtToken);
+//        Claims claims = jwt.getBody();
+//        System.out.println(claims);
+        try {
+        
+        JWT jwt = JWTParser.parse(jwtToken);
+        JWTClaimsSet claimsSet = jwt.getJWTClaimsSet();
+        System.out.println("jwt : "+claimsSet);
+        
+        //ReadOnlyJWTClaimsSet claimsSet = (ReadOnlyJWTClaimsSet) jwt.getJWTClaimsSet();
+        }catch (Exception e) {
+        	System.out.println(e.getMessage());
+        }
+    
         Map<String,Object> response = new HashMap<>();
         response.put("idToken",authResponse.authenticationResult().idToken());
         response.put("refreshToken",authResponse.authenticationResult().refreshToken());
